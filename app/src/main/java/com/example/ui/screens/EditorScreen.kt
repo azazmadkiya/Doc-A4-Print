@@ -63,6 +63,7 @@ fun EditorScreen(
     val cardPrintSize by viewModel.cardPrintSize.collectAsState()
     val showCutGuides by viewModel.showCutGuides.collectAsState()
     val showLabels by viewModel.showLabels.collectAsState()
+    val swapVersion by viewModel.swapVersion.collectAsState()
     val encryptionManager = remember { PDFEncryptionManager(context) }
     var isPasswordProtected by remember { mutableStateOf(false) }
     var showPasswordDialog by remember { mutableStateOf(false) }
@@ -114,7 +115,7 @@ fun EditorScreen(
             val bmp = BitmapFactory.decodeStream(stream)
             if (bmp != null) {
                 val classification = CardSideClassifier.classifyCardSide(bmp)
-                val targetSide = if (classification.side == DocumentSide.BACK) "BACK" else if (classification.side == DocumentSide.FRONT) "FRONT" else side
+                val targetSide = side // Strictly bind to requested slot to prevent unwanted swapping
 
                 val cropped = CardEdgeDetector.autoCropCard(bmp)
                 val file = File(context.cacheDir, "autocrop_${targetSide}_${System.currentTimeMillis()}.jpg")
@@ -124,22 +125,12 @@ fun EditorScreen(
                 out.close()
                 val newUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
-                if (targetSide != side) {
-                    if (targetSide == "FRONT") {
-                        viewModel.setFrontUri(newUri)
-                        Toast.makeText(context, "Smart Classifier: Classified as Front Side! Routed to Front slot.", Toast.LENGTH_LONG).show()
-                    } else {
-                        viewModel.setBackUri(newUri)
-                        Toast.makeText(context, "Smart Classifier: Classified as Back Side! Routed to Back slot.", Toast.LENGTH_LONG).show()
-                    }
+                if (targetSide == "FRONT") {
+                    viewModel.setFrontUri(newUri)
                 } else {
-                    if (side == "FRONT") {
-                        viewModel.setFrontUri(newUri)
-                    } else {
-                        viewModel.setBackUri(newUri)
-                    }
-                    Toast.makeText(context, "Aadhaar Card auto-detected & cropped (${classification.reason})!", Toast.LENGTH_SHORT).show()
+                    viewModel.setBackUri(newUri)
                 }
+                Toast.makeText(context, "Card auto-detected & cropped for $targetSide side (${classification.reason})!", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             Toast.makeText(context, "Auto-crop error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()

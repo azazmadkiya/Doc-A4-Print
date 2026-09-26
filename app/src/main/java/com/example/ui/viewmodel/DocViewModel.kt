@@ -41,6 +41,9 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
     private val _showLabels = MutableStateFlow(false)
     val showLabels: StateFlow<Boolean> = _showLabels.asStateFlow()
 
+    private val _swapVersion = MutableStateFlow(0)
+    val swapVersion: StateFlow<Int> = _swapVersion.asStateFlow()
+
     fun setDocTitle(title: String) {
         _docTitle.value = title
     }
@@ -57,6 +60,7 @@ class DocViewModel(application: Application) : AndroidViewModel(application) {
         val temp = _frontUri.value
         _frontUri.value = _backUri.value
         _backUri.value = temp
+        _swapVersion.value = (_swapVersion.value + 1) % 1000
     }
 
     fun setLayoutStyle(style: String) {

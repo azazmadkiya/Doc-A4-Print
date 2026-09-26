@@ -115,19 +115,19 @@ object PdfProcessor {
                 frontBitmap = page1Image
                 backBitmap = renderer.renderImageWithDPI(1, 300f)
             } else {
-                // Single page e-Aadhaar PDF:
-                // Top ~40% is instruction text. Bottom ~55% is the actual Aadhaar card.
+                // Single page e-Aadhaar / ID Card PDF:
+                // Instructions at top, card in lower portion with Front on Left and Back on Right side-by-side.
                 val width = page1Image.width
                 val height = page1Image.height
-                val cardTop = (height * 0.40f).toInt().coerceIn(0, height - 100)
-                val cardBottom = (height * 0.98f).toInt().coerceIn(cardTop + 100, height)
+                val cardTop = (height * 0.36f).toInt().coerceIn(0, height - 200)
+                val cardBottom = (height * 0.96f).toInt().coerceIn(cardTop + 200, height)
                 val cardHeight = cardBottom - cardTop
-                val halfCardH = cardHeight / 2
 
-                // Front Side = Top half of the Aadhaar card (Photo, Name, DOB, Aadhaar Number)
-                frontBitmap = Bitmap.createBitmap(page1Image, 0, cardTop, width, halfCardH)
-                // Back Side = Bottom half of the Aadhaar card (Address, QR Code)
-                backBitmap = Bitmap.createBitmap(page1Image, 0, cardTop + halfCardH, width, cardBottom - (cardTop + halfCardH))
+                val halfWidth = width / 2
+                // Front Side = Left half of the card region
+                frontBitmap = Bitmap.createBitmap(page1Image, 0, cardTop, halfWidth, cardHeight)
+                // Back Side = Right half of the card region
+                backBitmap = Bitmap.createBitmap(page1Image, halfWidth, cardTop, width - halfWidth, cardHeight)
             }
 
             document.close()
