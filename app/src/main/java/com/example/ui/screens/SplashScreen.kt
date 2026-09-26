@@ -138,15 +138,27 @@ fun SplashScreen(
             )
         }
 
-        // Bottom version
-        Text(
-            text = "Version 1.0 • Ready for Print",
-            color = Color(0xFF64748B),
-            fontSize = 12.sp,
+        // Bottom credits & version
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp)
-        )
+        ) {
+            Text(
+                text = "Developed By - Azazmadkiya",
+                color = Color(0xFF38BDF8),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Version 1.0 • Ready for Print",
+                color = Color(0xFF64748B),
+                fontSize = 12.sp
+            )
+        }
     }
 }
 
